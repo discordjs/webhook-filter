@@ -29,7 +29,7 @@ http.createServer((req, res) => {
 		}
 
 		// Make sure the request isn't too large
-		if(data.length > 20480) {
+		if(data.length > 30720) {
 			res.writeHead(400, { 'Content-type': 'application/json' });
 			res.end('{"error":"Request too large."}');
 			return;
