@@ -56,7 +56,8 @@ http.createServer((req, res) => {
 		// Ignore the event if it's for a push to a blacklisted repo/branch combo
 		const repo = payload.repository && payload.ref ? payload.repository.full_name : null;
 		if(event === 'push' && repo && refs[repo]) {
-			if(refs[repo].includes(payload.ref)) {
+			const patternMatch = (refPattern) => payload.ref.match(refPattern);
+			if(refs[repo].some(patternMatch)) {
 				console.log(`Skipping ${event} event for ${repo}#${payload.ref}: ${payload.after}`);
 				res.writeHead(200, { 'Content-type': 'application/json' });
 				res.end('{"message":"Skipped event for blacklisted repository/branch."}');
