@@ -2,7 +2,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const http = require('http');
 const bl = require('bl');
-const snekfetch = require('snekfetch');
+const fetch = require('node-fetch');
 
 // Load config and build list of refs to block
 const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
@@ -66,14 +66,20 @@ http.createServer((req, res) => {
 
 		// Forward event to Discord's webhook
 		try {
-			await snekfetch.post(config.webhook, {
-				data: payload,
+			const response = await fetch.default(config.webook, {
+				method: 'POST',
+				body: JSON.stringify(payload),
 				headers: {
 					'content-type': 'application/json',
 					'x-github-event': event,
 					'x-github-delivery': id
 				}
 			});
+			if(!response.ok) {
+				const json = response.headers.get('content-type') === 'application/json' ?
+					await response.json() : null;
+				throw json || new Error(`No JSON response recieved, status code: ${response.status}`);
+			}
 		} catch(err2) {
 			console.error('Error while forwarding event to Discord:', err2);
 			res.writeHead(500, { 'Content-type': 'application/json' });
