@@ -27,7 +27,7 @@
 	},
 	"dependencies": {
 		"bl": "^1.2.1",
-		"snekfetch": "^3.6.1"
+		"node-fetch": "^2.6.1"
 	},
 	"devDependencies": {
 		"eslint": "^4.15.0"
