@@ -66,7 +66,7 @@ http.createServer((req, res) => {
 
 		// Forward event to Discord's webhook
 		try {
-			const response = await fetch(config.webook, {
+			const response = await fetch(config.webhook, {
 				method: 'POST',
 				body: JSON.stringify(payload),
 				headers: {
