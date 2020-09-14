@@ -7,7 +7,7 @@ const snekfetch = require('snekfetch');
 // Load config and build list of refs to block
 const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 const refs = {};
-for(const [repo, branches] of Object.entries(config.blacklist)) refs[repo] = branches.map(b => `refs/heads/${b}`);
+for(const [repo, branches] of Object.entries(config.blocklist)) refs[repo] = branches.map(b => `refs/heads/${b}`);
 
 http.createServer((req, res) => {
 	// Make sure all headers are present
@@ -53,13 +53,13 @@ http.createServer((req, res) => {
 			return;
 		}
 
-		// Ignore the event if it's for a push to a blacklisted repo/branch combo
+		// Ignore the event if it's for a push to a blocked repo/branch combo
 		const repo = payload.repository && payload.ref ? payload.repository.full_name : null;
 		if(event === 'push' && repo && refs[repo]) {
 			if(refs[repo].some(pattern => payload.ref.match(pattern))) {
 				console.log(`Skipping ${event} event for ${repo}#${payload.ref}: ${payload.after}`);
 				res.writeHead(200, { 'Content-type': 'application/json' });
-				res.end('{"message":"Skipped event for blacklisted repository/branch."}');
+				res.end('{"message":"Skipped event for ignored repository/branch."}');
 				return;
 			}
 		}
